@@ -4,7 +4,6 @@ project(monitor)
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
-
 include_directories(include)
 file(GLOB SOURCES "src/*.cpp")
 
