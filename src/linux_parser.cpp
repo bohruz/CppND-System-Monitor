@@ -108,21 +108,20 @@ long LinuxParser::UpTime() {
 
 // TODO: Read and return the number of jiffies for the system
 long LinuxParser::Jiffies() {
-  std::vector<long> times = LinuxParser::CpuTimes();
-  return std::accumulate(times.begin(), times.end(), 0);
+  return LinuxParser::ActiveJiffies() + LinuxParser::IdleJiffies();
 }
 
 // TODO: Read and return the number of active jiffies for a PID
 // REMOVE: [[maybe_unused]] once you define the function
 long LinuxParser::ActiveJiffies(int pid) {
-  std::ifstream stream(LinuxParser::kProcDirectory + to_string(pid) +
-                       LinuxParser::kStatFilename);  // /proc/[PID]/stat
+  std::ifstream filestream(LinuxParser::kProcDirectory + to_string(pid) +
+                           LinuxParser::kStatFilename);  // /proc/[PID]/stat
   string value;
   long utime, stime, cutime, cstime;
 
-  if (stream.is_open()) {
+  if (filestream.is_open()) {
     for (int i = 1; i < 23; i++) {
-      std::getline(stream, value, ' ');
+      std::getline(filestream, value, ' ');
       switch (i) {
         case 14:
           utime = stol(value);
@@ -146,13 +145,38 @@ long LinuxParser::ActiveJiffies(int pid) {
 }
 
 // TODO: Read and return the number of active jiffies for the system
-long LinuxParser::ActiveJiffies() { return 0; }
+long LinuxParser::ActiveJiffies() {
+  std::vector<long> times = LinuxParser::CpuTimes();
+  return std::accumulate(times.begin(), times.end(), 0);
+}
 
 // TODO: Read and return the number of idle jiffies for the system
-long LinuxParser::IdleJiffies() { return 0; }
+long LinuxParser::IdleJiffies() {
+  long Idle, Iowait;
+  std::string line;
+  std::string DeleteMe;
+  std::ifstream filestream(LinuxParser::kProcDirectory +
+                           LinuxParser::kStatFilename);
+  if (filestream.is_open()) {
+    std::getline(filestream, line);
+    std::istringstream linestream(line);
+    linestream >> DeleteMe >> DeleteMe >> DeleteMe >> DeleteMe >> Idle >>
+        Iowait;
+  }
+  return (Idle + Iowait);
+}
 
 // TODO: Read and return CPU utilization
-vector<string> LinuxParser::CpuUtilization() { return {}; }
+vector<string> LinuxParser::CpuUtilization() {
+  std::vector<string> times;
+  std::ifstream filestream(kProcDirectory + kStatFilename);
+  if (filestream.is_open()) {
+    filestream.ignore(5, ' ');  // Skip the 'cpu' prefix.
+    for (string time; filestream >> time; times.push_back(time))
+      ;
+  }
+  return times;
+}
 
 // TODO: Read and return the total number of processes
 int LinuxParser::TotalProcesses() {
