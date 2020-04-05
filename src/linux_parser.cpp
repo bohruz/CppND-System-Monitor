@@ -3,7 +3,7 @@
 #include <dirent.h>
 #include <unistd.h>
 
-#include <algorithm>
+#include <numeric>
 #include <string>
 #include <vector>
 
@@ -108,18 +108,8 @@ long LinuxParser::UpTime() {
 
 // TODO: Read and return the number of jiffies for the system
 long LinuxParser::Jiffies() {
-  long user, nice, system, idle, iowait, irq, softirq, steal, guest, guestNice;
-  string cpu, line;
-  std::ifstream filestream(kProcDirectory + kStatFilename);
-  if (filestream.is_open()) {
-    std::getline(filestream, line);
-    std::istringstream linestream(line);
-    linestream >> cpu >> user >> nice >> system >> idle >> iowait >> irq >>
-        softirq >> steal >> guest >> guestNice;
-  }
-
-  return (user + nice + system + idle + iowait + irq + softirq + steal + guest +
-          guestNice);
+  std::vector<long> times = LinuxParser::CpuTimes();
+  return std::accumulate(times.begin(), times.end(), 0);
 }
 
 // TODO: Read and return the number of active jiffies for a PID
@@ -161,10 +151,9 @@ string LinuxParser::User(int pid [[maybe_unused]]) { return string(); }
 // REMOVE: [[maybe_unused]] once you define the function
 long LinuxParser::UpTime(int pid [[maybe_unused]]) { return 0; }
 
-std::vector<long> CpuTimes() {
+std::vector<long> LinuxParser::CpuTimes() {
   std::vector<long> times;
-  std::ifstream filestream(LinuxParser::kProcDirectory +
-                           LinuxParser::kStatFilename);
+  std::ifstream filestream(kProcDirectory + kStatFilename);
   if (filestream.is_open()) {
     filestream.ignore(5, ' ');  // Skip the 'cpu' prefix.
     for (long time; filestream >> time; times.push_back(time))
