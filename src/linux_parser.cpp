@@ -3,6 +3,7 @@
 #include <dirent.h>
 #include <unistd.h>
 
+#include <algorithm>
 #include <string>
 #include <vector>
 
@@ -159,3 +160,15 @@ string LinuxParser::User(int pid [[maybe_unused]]) { return string(); }
 // TODO: Read and return the uptime of a process
 // REMOVE: [[maybe_unused]] once you define the function
 long LinuxParser::UpTime(int pid [[maybe_unused]]) { return 0; }
+
+std::vector<long> CpuTimes() {
+  std::vector<long> times;
+  std::ifstream filestream(LinuxParser::kProcDirectory +
+                           LinuxParser::kStatFilename);
+  if (filestream.is_open()) {
+    filestream.ignore(5, ' ');  // Skip the 'cpu' prefix.
+    for (long time; filestream >> time; times.push_back(time))
+      ;
+  }
+  return times;
+}
