@@ -84,12 +84,12 @@ float LinuxParser::MemoryUtilization() {
         }
         if (key == "MemFree") {
           MemFree = value;
+          return (MemTotal - MemFree) / MemTotal;
         }
       }
     }
   }
-
-  return (MemTotal - MemFree) / MemTotal;
+  return 0;
 }
 
 // TODO: Read and return the system uptime
@@ -139,10 +139,11 @@ int LinuxParser::TotalProcesses() {
 
       if (key == "processes") {
         processes = value;
+        return processes;
       }
     }
   }
-  return processes;
+  return 0;
 }
 
 // TODO: Read and return the number of running processes
@@ -159,10 +160,11 @@ int LinuxParser::RunningProcesses() {
 
       if (key == "procs_running") {
         procs_running = value;
+        return procs_running;
       }
     }
   }
-  return procs_running;
+  return 0;
 }
 
 // TODO: Read and return the command associated with a process
