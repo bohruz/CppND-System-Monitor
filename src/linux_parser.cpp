@@ -220,6 +220,16 @@ int LinuxParser::RunningProcesses() {
   return 0;
 }
 
+// CPU Utilization for a specific process
+float LinuxParser::CpuUtilization(int pid) {
+  long upTime = LinuxParser::UpTime();               // System Uptime
+  long totalTime = LinuxParser::ActiveJiffies(pid);  // Process total time
+  long startTime = LinuxParser::UpTime(pid);         // Process Uptime
+  long seconds = upTime - (startTime / sysconf(_SC_CLK_TCK));
+
+  return ((float)(totalTime / sysconf(_SC_CLK_TCK))) / (float)seconds;
+}
+
 // TODO: Read and return the command associated with a process
 // REMOVE: [[maybe_unused]] once you define the function
 string LinuxParser::Command(int pid) {
