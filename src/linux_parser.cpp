@@ -286,7 +286,6 @@ string LinuxParser::Uid(int pid) {
 string LinuxParser::User(int pid) {
   string uid = Uid(pid), userName;
   std::ifstream filestream(kPasswordPath);
-  long runningProcesses = 0;
   if (filestream.is_open()) {
     string line;
 
