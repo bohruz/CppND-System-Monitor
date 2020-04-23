@@ -2,7 +2,7 @@
 
 ![System Monitor](images/monitor.png)
 
-In this project I developed a system monitor inspired in the **htop** linux system monitor. The system monitor was built with the C++ ncurses library that make easy to create a **tui** aplication.
+In this project I developed a system monitor inspired in the **htop** linux system monitor. The system monitor was built with the C++ ncurses library that make easy to create a **tui** application.
 
 ## ncurses
 [ncurses](https://www.gnu.org/software/ncurses/) is a library that facilitates text-based graphical output in the terminal. This project relies on ncurses for display output.
